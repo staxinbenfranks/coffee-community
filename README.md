@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LA Coffee Community (proof of concept)
 
-## Getting Started
+Next.js 16 (App Router, TS, Tailwind) + Supabase (magic-link auth, Postgres, storage). Deploys to Vercel.
 
-First, run the development server:
+## What's built
+Profiles · cafe pages · threaded posts with nested replies and timestamps · "LA Coffee" general space ·
+cafe search (name / city / state) · admin pages to add/edit cafes · RLS (anyone reads, signed-in users write as themselves, admin-only cafes).
+Upvotes were left out (optional in the brief).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Setup (≈15 min)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Supabase project**: create one at supabase.com.
+2. **SQL Editor** → paste and run `supabase/schema.sql`, then `supabase/seed.sql`.
+3. **Auth → URL Configuration**: set Site URL to your Vercel URL and add `http://localhost:3000/**` and `https://YOUR-APP.vercel.app/**` to Redirect URLs.
+4. **Auth → Email Templates → Magic Link**: add the code so phone users who open the email in a different browser can still sign in:
+   `<p>Or enter this code: <b>{{ .Token }}</b></p>` (the app has a code box for this).
+   Supabase's built-in email sender is rate-limited (a few per hour) — for 10–20 friends signing up, configure custom SMTP (Resend, Postmark…) under Auth → SMTP.
+5. `cp .env.local.example .env.local` and fill in the project URL and anon key (Project Settings → API).
+6. `npm install && npm run dev`, open http://localhost:3000, sign in once.
+7. **Make yourself admin** (SQL Editor):
+   ```sql
+   update public.profiles set is_admin = true
+     where id = (select id from auth.users where email = 'YOUR_EMAIL');
+   ```
+   An **Admin** link appears in the header.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy to Vercel
+Push to GitHub → import in Vercel → add the two `NEXT_PUBLIC_SUPABASE_*` env vars → deploy. Then put the Vercel URL in Supabase's Site URL (step 3).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+- **Seed data is placeholder.** The 20 cafes are real LA names, but addresses were filled in only where confident and all links/photos are empty. Verify and complete them in `/admin`.
+- Each cafe automatically gets its own discussion community (database trigger); renaming a cafe renames it too.
+- Moderation: admins (and authors) can delete posts/comments via RLS, but there's no UI yet — use the Supabase table editor.
+- Next 16 renamed middleware to `proxy.ts` (`src/proxy.ts` refreshes the session).
