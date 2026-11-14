@@ -6,6 +6,8 @@ import { socialUrl } from "@/lib/format";
 import type { Cafe, Community } from "@/lib/types";
 import PostList from "@/components/PostList";
 import NewPostForm from "@/components/NewPostForm";
+import JoinBar from "@/components/JoinBar";
+import CafeChat from "@/components/CafeChat";
 import Link from "next/link";
 
 export default async function CafePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -15,8 +17,13 @@ export default async function CafePage({ params }: { params: Promise<{ slug: str
   if (!data) notFound();
   const cafe = data as Cafe;
   const { data: comm } = await supabase.from("communities").select("*").eq("cafe_id", cafe.id).single();
+  if (!comm) notFound();
   const community = comm as Community;
   const me = await getSessionProfile();
+  const { count } = await supabase.from("cafe_memberships").select("*", { count: "exact", head: true }).eq("cafe_id", cafe.id);
+  const joined = me
+    ? !!(await supabase.from("cafe_memberships").select("user_id").eq("cafe_id", cafe.id).eq("user_id", me.id).maybeSingle()).data
+    : false;
 
   const links = [
     cafe.website && { label: "Website", href: cafe.website },
@@ -40,6 +47,9 @@ export default async function CafePage({ params }: { params: Promise<{ slug: str
           ) : `${cafe.city}, ${cafe.state}`}
         </p>
         {cafe.description && <p className="mt-2 text-sm">{cafe.description}</p>}
+        <div className="mt-3">
+          <JoinBar mode="cafe" cafeId={cafe.id} joined={joined} count={count ?? 0} userId={me?.id ?? null} next={`/cafes/${cafe.slug}`} />
+        </div>
         {links.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
             {links.map((l) => <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className="rounded-full border border-stone-300 px-3 py-1 text-sm">{l.label} ↗</a>)}
@@ -47,6 +57,7 @@ export default async function CafePage({ params }: { params: Promise<{ slug: str
         )}
         {me?.is_admin && <Link href={`/admin/cafes/${cafe.id}`} className="mt-3 inline-block text-xs text-stone-500 underline">Edit cafe</Link>}
       </div>
+      <CafeChat communityId={community.id} me={me} heading={`${cafe.name} chat`} />
       <section className="space-y-3">
         <h2 className="font-semibold">Discussion</h2>
         <NewPostForm communityId={community.id} userId={me?.id ?? null} next={`/cafes/${cafe.slug}`} />
