@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import MessengerDock from "@/components/MessengerDock";
 
 const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
@@ -16,7 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={geist.variable}>
       <body className="min-h-dvh font-sans antialiased">
         <Header />
-        <main className="mx-auto w-full max-w-2xl px-4 pb-24 pt-4">{children}</main>
+        <main className="mx-auto w-full max-w-2xl px-4 pb-32 pt-4">{children}</main>
+        <MessengerDock />
       </body>
     </html>
   );

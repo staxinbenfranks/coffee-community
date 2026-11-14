@@ -1,7 +1,7 @@
 -- ~20 LA cafes to get started. Run AFTER schema.sql.
 -- PLACEHOLDER DATA: names are real LA cafes, but addresses/links were filled in only where
 -- I was confident and everything should be verified and completed in /admin before sharing.
--- (A trigger auto-creates each cafe's discussion community.)
+-- (A trigger auto-creates each cafe's discussion community and its chat room.)
 insert into public.cafes (name, slug, city, state, address, description) values
  ('Intelligentsia Coffee – Silver Lake', 'intelligentsia-silver-lake', 'Los Angeles', 'CA', '3922 W Sunset Blvd', 'Specialty coffee roaster and bar in Silver Lake.'),
  ('Go Get Em Tiger – Larchmont', 'go-get-em-tiger-larchmont', 'Los Angeles', 'CA', '230 N Larchmont Blvd', 'Neighborhood coffee shop on Larchmont Boulevard.'),

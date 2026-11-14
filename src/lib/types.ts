@@ -64,3 +64,22 @@ export type CommentRow = {
   deleted_at: string | null;
   author: AuthorLite | null;
 };
+
+export type PresenceStatus = "online" | "away" | "offline";
+
+export type ChatPerson = {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+};
+
+export type ChatMessage = {
+  id: string;
+  room_id: string;
+  sender_id: string | null;
+  body: string;
+  created_at: string;
+  edited_at: string | null;
+  deleted_at: string | null;
+};

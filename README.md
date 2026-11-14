@@ -11,6 +11,8 @@ Upvotes were left out (optional in the brief).
 
 1. **Supabase project**: create one at supabase.com.
 2. **SQL Editor** → paste and run `supabase/schema.sql`, then `supabase/seed.sql`.
+   Then **Settings → API → Exposed schemas** and add `chat` (keep `public`). Chat, DMs, and the buddy list need this. See `docs/chat-backend.md`.
+   An existing project must not re-run `schema.sql`. Run `supabase/migrations/003_chat.sql` instead, then expose `chat`, before deploying the app.
 3. **Auth → URL Configuration**: set Site URL to your Vercel URL and add `http://localhost:3000/**` and `https://YOUR-APP.vercel.app/**` to Redirect URLs.
 4. **Auth → Email Templates → Magic Link**: add the code so phone users who open the email in a different browser can still sign in:
    `<p>Or enter this code: <b>{{ .Token }}</b></p>` (the app has a code box for this).

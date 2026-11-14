@@ -42,6 +42,7 @@ function photoPathsFromForm(fd: FormData, userId: string): { paths: string[] } |
 
 export async function signOut() {
   const supabase = await createClient();
+  await supabase.schema("chat").rpc("touch_status", { p_status: "offline" });
   await supabase.auth.signOut();
   redirect("/");
 }

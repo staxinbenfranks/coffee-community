@@ -13,6 +13,7 @@ export default async function Header() {
         <nav className="flex flex-1 flex-wrap gap-3 text-stone-600">
           <Link href="/cafes" className="hover:text-stone-900">Cafes</Link>
           <Link href="/c/la-coffee" className="hover:text-stone-900">Community</Link>
+          {me && <Link href="/messages" className="hover:text-stone-900">Messages</Link>}
           {me?.is_admin && <Link href="/admin" className="hover:text-stone-900">Admin</Link>}
           {me && isPlaceholderUsername(me.username) ? <Link href="/welcome" className="font-medium text-amber-900">Pick a username</Link> : null}
         </nav>
