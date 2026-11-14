@@ -1,7 +1,7 @@
 -- Coffee Community schema.
 -- Fresh project: run this whole file once in the Supabase SQL editor, then seed.sql.
 -- It includes chat (schema `chat` + cafe memberships). After it succeeds, add `chat` to
--- Exposed schemas (Settings → API). See docs/chat-backend.md.
+-- Exposed schemas (Integrations → Data API). See docs/chat-backend.md.
 -- Existing project: do not re-run this file. Run the files in supabase/migrations/ in order
 -- (002_photos_comments_usernames.sql, then 003_chat.sql). Run 003 before deploying chat.
 

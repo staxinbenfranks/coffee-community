@@ -11,7 +11,7 @@ The chat tables are generic. Coffee-specific behavior (who is a member of a cafe
 | `chat` | Rooms, members, messages, buddies, blocks, last-seen. No foreign keys to cafes, posts, or communities. |
 | `public` | `cafe_memberships`, plus the triggers and RPCs that open or close a community's room when someone joins or leaves. |
 
-`chat` is not exposed by default. After the migration, add it under **Settings → API → Exposed schemas** (keep `public`). Until you do, `.schema('chat')` returns a schema error.
+`chat` is not exposed by default. After the migration, open **Integrations → Data API** (not Settings → API Keys) and add `chat` to **Exposed schemas**. Keep `public`. Until you do, `.schema('chat')` returns a schema error.
 
 Grants:
 
@@ -223,7 +223,7 @@ Official clients take a schema option (`schema('chat')` in supabase-js, the equi
 Do this on the existing project **before** the web app that calls `chat` is deployed. Do not re-run `schema.sql` or migrations 001/002. Do not change Auth settings, email templates, or storage.
 
 1. Supabase → SQL Editor → paste `supabase/migrations/003_chat.sql` → Run. It is safe to run again; it does not delete rows.
-2. Settings → API → Exposed schemas → add `chat` next to `public` → Save.
+2. Left sidebar → **Integrations** → **Data API** → add `chat` to **Exposed schemas**, keep `public`, and save. This is the Data API item, one row below API Keys. Do not create a key and do not copy the secret key.
 3. Database → Publications → `supabase_realtime` includes `chat.messages`, `chat.room_members`, `chat.buddies`, `chat.blocks`, `chat.user_status`, and `public.cafe_memberships`. The migration adds them. Confirm, and toggle any that are missing.
 4. Realtime → Settings → turn **Allow public access** off so the private channel policies above are actually enforced.
 5. Deploy the app. It keeps using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` only.

@@ -2,7 +2,7 @@
 -- Existing database: run this file in the SQL editor. Do not re-run schema.sql or migrations 001/002.
 -- Safe to run more than once. It does not delete rows.
 --
--- After it succeeds, add `chat` to Exposed schemas (Settings → API) before deploying the app.
+-- After it succeeds, add `chat` to Exposed schemas (Integrations → Data API, not API Keys) before deploying the app.
 -- See docs/chat-backend.md.
 
 create extension if not exists pgcrypto;
