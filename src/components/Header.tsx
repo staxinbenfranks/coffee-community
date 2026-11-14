@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSessionProfile } from "@/lib/auth";
+import { isPlaceholderUsername } from "@/lib/username";
 import { signOut } from "@/app/actions";
 import Avatar from "./Avatar";
 
@@ -7,12 +8,13 @@ export default async function Header() {
   const me = await getSessionProfile();
   return (
     <header className="sticky top-0 z-10 border-b border-stone-200 bg-[#faf7f2]/95 backdrop-blur">
-      <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-3 text-sm">
+      <div className="mx-auto flex max-w-2xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 text-sm">
         <Link href="/" className="font-bold tracking-tight text-amber-900">☕ LA Coffee</Link>
-        <nav className="flex flex-1 gap-3 text-stone-600">
+        <nav className="flex flex-1 flex-wrap gap-3 text-stone-600">
           <Link href="/cafes" className="hover:text-stone-900">Cafes</Link>
           <Link href="/c/la-coffee" className="hover:text-stone-900">Community</Link>
           {me?.is_admin && <Link href="/admin" className="hover:text-stone-900">Admin</Link>}
+          {me && isPlaceholderUsername(me.username) ? <Link href="/welcome" className="font-medium text-amber-900">Pick a username</Link> : null}
         </nav>
         {me ? (
           <div className="flex items-center gap-3">

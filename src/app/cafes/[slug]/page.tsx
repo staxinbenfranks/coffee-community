@@ -49,7 +49,7 @@ export default async function CafePage({ params }: { params: Promise<{ slug: str
       </div>
       <section className="space-y-3">
         <h2 className="font-semibold">Discussion</h2>
-        <NewPostForm communityId={community.id} signedIn={!!me} next={`/cafes/${cafe.slug}`} />
+        <NewPostForm communityId={community.id} userId={me?.id ?? null} next={`/cafes/${cafe.slug}`} />
         <PostList communityId={community.id} />
       </section>
     </div>

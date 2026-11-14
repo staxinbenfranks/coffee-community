@@ -34,21 +34,33 @@ export type Cafe = {
 
 export type Community = { id: string; name: string; slug: string; cafe_id: string | null };
 
+export type PostPhoto = {
+  id: string;
+  url: string;
+  position: number;
+  created_at?: string | null;
+};
+
 export type PostRow = {
   id: string;
   community_id: string;
+  author_id: string;
   title: string;
   body: string | null;
   created_at: string;
+  deleted_at: string | null;
   author: AuthorLite | null;
   comments: { count: number }[];
+  photos?: PostPhoto[] | null;
 };
 
 export type CommentRow = {
   id: string;
   post_id: string;
   parent_comment_id: string | null;
+  author_id: string;
   body: string;
   created_at: string;
+  deleted_at: string | null;
   author: AuthorLite | null;
 };

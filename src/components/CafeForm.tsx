@@ -1,8 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { useActionState, useState } from "react";
 import { saveCafe } from "@/app/actions";
 import { uploadPublic } from "@/lib/upload";
 import type { Cafe } from "@/lib/types";
+import MoveButtons from "./MoveButtons";
 
 const input = "w-full rounded-lg border border-stone-300 bg-white px-3 py-2";
 
@@ -11,9 +13,13 @@ export default function CafeForm({ cafe }: { cafe?: Cafe }) {
   const [photos, setPhotos] = useState((cafe?.photos ?? []).join("\n"));
   const [upErr, setUpErr] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [confirm, setConfirm] = useState<number | null>(null);
+  const list = photos.split("\n").map((line) => line.trim()).filter(Boolean);
 
   async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []);
+    const inputEl = e.currentTarget;
+    const files = Array.from(inputEl.files ?? []);
+    inputEl.value = "";
     if (!files.length) return;
     setUploading(true); setUpErr("");
     try {
@@ -24,12 +30,26 @@ export default function CafeForm({ cafe }: { cafe?: Cafe }) {
     setUploading(false);
   }
 
+  function move(index: number, dir: -1 | 1) {
+    const next = list.slice();
+    const target = index + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    setPhotos(next.join("\n"));
+    setConfirm(null);
+  }
+
+  function removeAt(index: number) {
+    setPhotos(list.filter((_, i) => i !== index).join("\n"));
+    setConfirm(null);
+  }
+
   const f = (name: string, label: string, def?: string | null, extra: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
     <label className="block text-sm">{label}<input name={name} defaultValue={def ?? ""} className={input} {...extra} /></label>
   );
 
   return (
-    <form action={action} className="space-y-4">
+    <form action={action} onSubmit={(e) => { if (uploading) e.preventDefault(); }} className="space-y-4">
       {cafe && <input type="hidden" name="id" value={cafe.id} />}
       {f("name", "Name", cafe?.name, { required: true })}
       {f("slug", "URL slug (optional, auto from name)", cafe?.slug, { autoCapitalize: "none" })}
@@ -45,8 +65,29 @@ export default function CafeForm({ cafe }: { cafe?: Cafe }) {
       {f("instagram", "Instagram (handle or URL)", cafe?.instagram)}
       {f("tiktok", "TikTok (handle or URL)", cafe?.tiktok)}
       <div>
-        <label className="block text-sm">Photo URLs (one per line)
-          <textarea name="photos" rows={4} value={photos} onChange={(e) => setPhotos(e.target.value)} className={input} /></label>
+        <p className="text-sm">Photos</p>
+        {list.length > 0 ? <p className="text-xs text-stone-500">First photo is the cover. Use the arrows to reorder.</p> : null}
+        {list.length > 0 ? (
+          <ul className="mt-2 space-y-2">
+            {list.map((url, i) => (
+              <li key={`${url}:${i}`} className="flex flex-wrap items-center gap-2 rounded-lg border border-stone-200 bg-stone-50 p-2">
+                <img src={url} alt="" className="h-16 w-16 shrink-0 rounded-lg object-cover" />
+                <MoveButtons index={i} total={list.length} disabled={pending || uploading} onMove={(dir) => move(i, dir)} />
+                {confirm === i ? (
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm text-stone-600">Remove this photo?</span>
+                    <button type="button" onClick={() => removeAt(i)} className="min-h-11 rounded-full bg-red-700 px-4 text-sm font-medium text-white">Remove</button>
+                    <button type="button" onClick={() => setConfirm(null)} className="min-h-11 px-2 text-sm text-stone-500">Cancel</button>
+                  </span>
+                ) : (
+                  <button type="button" onClick={() => setConfirm(i)} className="min-h-11 px-3 text-sm font-medium text-red-700">Delete</button>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <label className="mt-2 block text-sm">Photo URLs (one per line)
+          <textarea name="photos" rows={4} value={photos} onChange={(e) => { setPhotos(e.target.value); setConfirm(null); }} className={input} /></label>
         <label className="mt-1 inline-block text-sm font-medium text-amber-900">
           {uploading ? "Uploading…" : "＋ Upload photos"}
           <input type="file" accept="image/*" multiple onChange={onFiles} className="hidden" />
