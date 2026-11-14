@@ -10,7 +10,18 @@ export default function LoginForm({ next }: { next: string }) {
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [password, setPassword] = useState("");
+  const [usePassword, setUsePassword] = useState(false);
   const supabase = createClient();
+
+  async function passwordSignIn(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true); setError("");
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) { setBusy(false); setError(error.message); return; }
+    router.replace(`/welcome?next=${encodeURIComponent(next)}`);
+    router.refresh();
+  }
 
   async function send(e: React.FormEvent) {
     e.preventDefault();
@@ -32,6 +43,18 @@ export default function LoginForm({ next }: { next: string }) {
     router.refresh();
   }
 
+  if (usePassword)
+    return (
+      <form onSubmit={passwordSignIn} className="space-y-3">
+        <input type="email" required autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@email.com" className="w-full rounded-lg border border-stone-300 bg-white px-3 py-3" />
+        <input type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password" className="w-full rounded-lg border border-stone-300 bg-white px-3 py-3" />
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        <button disabled={busy} className="w-full rounded-full bg-amber-900 py-3 font-medium text-white disabled:opacity-50">{busy ? "Signing in…" : "Sign in"}</button>
+        <button type="button" onClick={() => { setUsePassword(false); setError(""); }} className="text-sm text-stone-500">Email me a link instead</button>
+      </form>
+    );
   if (!sent)
     return (
       <form onSubmit={send} className="space-y-3">
@@ -39,6 +62,7 @@ export default function LoginForm({ next }: { next: string }) {
           placeholder="you@email.com" className="w-full rounded-lg border border-stone-300 bg-white px-3 py-3" />
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button disabled={busy} className="w-full rounded-full bg-amber-900 py-3 font-medium text-white disabled:opacity-50">{busy ? "Sending…" : "Email me a sign-in link"}</button>
+        <button type="button" onClick={() => { setUsePassword(true); setError(""); }} className="text-sm text-stone-500">Have a password? Sign in with it</button>
       </form>
     );
   return (
