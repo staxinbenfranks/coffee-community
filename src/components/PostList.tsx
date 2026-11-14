@@ -3,7 +3,7 @@ import type { PostRow } from "@/lib/types";
 import PostCard from "./PostCard";
 
 export const POST_SELECT =
-  "id, community_id, title, body, created_at, author:profiles(username, display_name, avatar_url, role), comments(count)";
+  "id, community_id, author_id, title, body, created_at, deleted_at, author:profiles(username, display_name, avatar_url, role), comments(count), photos:post_photos(id, url, position, created_at)";
 
 export default async function PostList({ communityId }: { communityId: string }) {
   const supabase = await createClient();

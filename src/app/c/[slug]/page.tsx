@@ -18,7 +18,7 @@ export default async function CommunityPage({ params }: { params: Promise<{ slug
         <h1 className="text-2xl font-bold">{c.name}</h1>
         <p className="text-sm text-stone-500">Open discussion for everyone in LA coffee.</p>
       </div>
-      <NewPostForm communityId={c.id} signedIn={!!me} next={`/c/${c.slug}`} />
+      <NewPostForm communityId={c.id} userId={me?.id ?? null} next={`/c/${c.slug}`} />
       <PostList communityId={c.id} />
     </div>
   );
